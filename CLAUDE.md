@@ -1,0 +1,38 @@
+# CLAUDE.md
+
+このファイルは、リポジトリ内のコードを扱う際に Claude Code (claude.ai/code) へのガイダンスを提供します。
+
+## プロジェクトの目的
+
+Next.js で構築された AI 駆動のタイム管理アプリケーション。現在は初期スキャフォールディング段階。
+
+## コマンド
+
+```bash
+npm run dev      # 開発サーバーを起動 (http://localhost:3000)
+npm run build    # 本番ビルド
+npm run start    # 本番サーバーを起動
+npm run lint     # ESLint を実行
+```
+
+テストランナーは未設定。
+
+## スタック
+
+- **Next.js 16.3.6** — App Router 使用 (`src/app/`)
+- **React 19**
+- **TypeScript** — strict モード有効
+- **Tailwind CSS v4** — `@import "tailwindcss"` 構文を使用 (v3 のディレクティブではない)
+- **Geist** フォント (`next/font/google` 経由)
+
+## アーキテクチャ
+
+App Router の規則に従い、すべてのルートは `src/app/` 以下に配置する。ルートレイアウト (`src/app/layout.tsx`) が Geist フォント変数と flex-column の body で全体をラップしている。
+
+パスエイリアス `@/*` は `./src/*` に解決される。
+
+## 設定上の注意点
+
+- **Tailwind v4**: テーマの拡張は `tailwind.config.js` ではなく、`globals.css` 内の `@theme inline` ブロックで行う。
+- **CSS 変数**: `--background` と `--foreground` は `:root` で定義され、`@media (prefers-color-scheme: dark)` でダークモード用の値を上書きしている。
+- **ESLint**: `eslint-config-next/core-web-vitals` と `eslint-config-next/typescript` を使用。設定は `eslint.config.mjs`（フラット設定フォーマット）。
