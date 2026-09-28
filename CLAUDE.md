@@ -31,6 +31,15 @@ App Router の規則に従い、すべてのルートは `src/app/` 以下に配
 
 パスエイリアス `@/*` は `./src/*` に解決される。
 
+## Supabase
+
+Supabase を使用する際は必ず `.claude/supabase_document.md` を参照すること。
+
+- **開発環境**: クラウドベース（方法1）を使用。Docker は使用しない。
+- 環境変数は `.env.local` に設定し、API キーはユーザーが手動で入力する。
+- マイグレーションは `npx supabase db push` でクラウド環境に適用する。
+- RLS ポリシーは Clerk 認証との統合を考慮して設計する。
+
 ## 設定上の注意点
 
 - **Tailwind v4**: テーマの拡張は `tailwind.config.js` ではなく、`globals.css` 内の `@theme inline` ブロックで行う。
