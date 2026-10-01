@@ -31,14 +31,27 @@ App Router の規則に従い、すべてのルートは `src/app/` 以下に配
 
 パスエイリアス `@/*` は `./src/*` に解決される。
 
+## Clerk
+
+認証・サブスクリプション・課金機能を実装する際は必ず `.claude/clerk_document.md` を参照すること。
+
+- **認証**: サインイン・サインアップ・セッション管理はすべて Clerk を使用する。
+- **サブスクリプション・課金**: プラン管理・課金機能の実装も Clerk ドキュメントの指示に従う。
+
 ## Supabase
 
 Supabase を使用する際は必ず `.claude/supabase_document.md` を参照すること。
+
+Supabase と Clerk を**連携させて使用する**際は `.claude/clerk_supabase_integration_document.md` を参照すること。
 
 - **開発環境**: クラウドベース（方法1）を使用。Docker は使用しない。
 - 環境変数は `.env.local` に設定し、API キーはユーザーが手動で入力する。
 - マイグレーションは `npx supabase db push` でクラウド環境に適用する。
 - RLS ポリシーは Clerk 認証との統合を考慮して設計する。
+
+## Tailwind CSS
+
+Tailwind CSS のセットアップや設定を行う際は必ず `.claude/tailwind_document.md` を参照すること。
 
 ## 設定上の注意点
 
