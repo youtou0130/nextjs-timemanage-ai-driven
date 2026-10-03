@@ -24,6 +24,7 @@ export type Database = {
           week_start_day?: 'monday' | 'sunday'
           updated_at?: string
         }
+        Relationships: []
       }
       categories: {
         Row: {
@@ -50,6 +51,7 @@ export type Database = {
           is_favorite?: boolean
           updated_at?: string
         }
+        Relationships: []
       }
       time_entries: {
         Row: {
@@ -82,18 +84,21 @@ export type Database = {
           memo?: string | null
           updated_at?: string
         }
+        Relationships: []
       }
     }
+    Views: Record<string, never>
     Functions: {
       get_clerk_user_id: {
-        Args: Record<string, never>
+        Args: Record<PropertyKey, never>
         Returns: string | null
       }
     }
+    Enums: Record<string, never>
+    CompositeTypes: Record<string, never>
   }
 }
 
-// テーブルの Row 型を便利エイリアスとして公開
 export type UserRow      = Database['public']['Tables']['users']['Row']
 export type CategoryRow  = Database['public']['Tables']['categories']['Row']
 export type TimeEntryRow = Database['public']['Tables']['time_entries']['Row']

@@ -23,3 +23,8 @@ youtou0130@gmail.com
 Yang12345678901#
 
 
+git add .
+git commit -m "commit フェーズ1: 基盤構築"
+git push
+
+

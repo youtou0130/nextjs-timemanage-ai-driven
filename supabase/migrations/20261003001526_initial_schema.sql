@@ -185,3 +185,14 @@ CREATE POLICY "time_entries_delete_own"
     user_id = get_clerk_user_id()
     OR current_setting('request.jwt.claims', true)::json->>'role' = 'service_role'
   );
+
+-- ──────────────────────────────────────────────────────────────────────────
+-- テーブルアクセス権限付与
+-- SQL Editorでテーブルを作成した場合、明示的なGRANTが必要
+-- ──────────────────────────────────────────────────────────────────────────
+GRANT ALL ON TABLE public.users        TO anon, authenticated, service_role;
+GRANT ALL ON TABLE public.categories   TO anon, authenticated, service_role;
+GRANT ALL ON TABLE public.time_entries TO anon, authenticated, service_role;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+  GRANT ALL ON TABLES TO anon, authenticated, service_role;
