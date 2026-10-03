@@ -57,3 +57,59 @@
     outline: none;
   }
 }
+
+/* ── 印刷 / PDF 出力用スタイル ─────────────────────────────── */
+@media print {
+  /* ヘッダー・サイドバー・操作UI を非表示 */
+  header,
+  aside,
+  .no-print {
+    display: none !important;
+  }
+
+  /* ページ余白リセット */
+  @page {
+    margin: 12mm 10mm;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #111827 !important;
+  }
+
+  /* メインエリアをフル幅に */
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* レポートコンテンツ */
+  #analytics-report-content {
+    background: #ffffff !important;
+    padding: 0 !important;
+    gap: 12px !important;
+  }
+
+  /* SVG（グラフ）がはみ出さないように */
+  svg {
+    overflow: visible !important;
+    max-width: 100% !important;
+  }
+
+  /* Recharts の ResponsiveContainer を強制的に幅指定 */
+  .recharts-responsive-container {
+    width: 100% !important;
+  }
+
+  /* ヒートマップのセルが潰れないように */
+  #analytics-report-content [class*="aspect-square"] {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  /* ページまたぎを防ぐ */
+  #analytics-report-content > * {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}

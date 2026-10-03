@@ -27,4 +27,9 @@ git add .
 git commit -m "commit フェーズ1: 基盤構築"
 git push
 
+git add .
+git commit -m "commit フェーズ4: データ表示と基本分析"
+git push
+
+
 

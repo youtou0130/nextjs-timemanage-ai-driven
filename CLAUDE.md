@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## プロジェクトの目的
 
-**Project Tracker** — タイマー計測・手動入力・カテゴリ管理でシンプルに作業時間を記録・分析する Next.js タイム管理アプリ。
+**Project Tracker** — タイマー計測・手動入力・カテゴリ管理でシンプルに作業時間を記録・分析する Next.js タイム管理アプリ。無料プランと premium プランを Clerk Billing で管理。
 
 ## コマンド
 
@@ -30,6 +30,7 @@ npx supabase db push                # クラウドへ適用
 - **Tailwind CSS v4** — `@import "tailwindcss"` 構文、`tailwind.config.js` は不要
 - **Clerk v7（Core 3）** — `@clerk/nextjs ^7`
 - **Supabase** — `@supabase/supabase-js ^2`、クラウドベース（Docker 不使用）
+- **Recharts** — プレミアム分析グラフ（棒・円・カスタムヒートマップ）
 - **lucide-react** — アイコン
 
 ## アーキテクチャ概観
@@ -41,6 +42,7 @@ src/
 │   ├── providers.tsx        # ClerkProvider + TimerProvider
 │   ├── middleware.ts        # Clerk 認証ミドルウェア（← src/ 直下が必須）
 │   ├── page.tsx             # ランディングページ (/)
+│   ├── pricing/page.tsx     # 料金ページ（PricingTableClient + 比較表）
 │   ├── sign-in/[[...sign-in]]/
 │   ├── sign-up/[[...sign-up]]/
 │   ├── dashboard/
@@ -49,32 +51,47 @@ src/
 │   ├── categories/
 │   │   ├── layout.tsx       # Sidebar を含む 2 カラムレイアウト
 │   │   └── page.tsx
+│   ├── reports/
+│   │   ├── layout.tsx       # Sidebar を含む 2 カラムレイアウト
+│   │   └── page.tsx         # PlanProtect で ReportsContent を保護
 │   └── api/
 │       ├── categories/route.ts           # GET(?), POST
 │       ├── categories/[id]/route.ts      # PUT, DELETE
 │       ├── time-entries/route.ts         # GET(?since&limit), POST
 │       ├── time-entries/[id]/route.ts    # PUT, DELETE
-│       └── export/csv/route.ts           # GET(?start&end) → CSV ダウンロード
+│       ├── analytics/route.ts            # GET(?start&end) → 日別時系列・カテゴリ・生産性指標
+│       └── export/csv/route.ts           # GET(?start&end) → UTF-8 BOM 付き CSV
 ├── components/
 │   ├── Header.tsx            # 全ページ共通（useAuth で認証状態判定）
-│   ├── Sidebar.tsx           # アプリ内ナビ（dashboard/categories/reports/user-setting）
-│   ├── UserMenu.tsx          # ヘッダー用ユーザーメニュー
+│   ├── Sidebar.tsx           # アプリ内ナビ
+│   ├── PlanProtect.tsx       # useAuth().has() でプランチェック（フリーならUpgradePrompt表示）
+│   ├── UpgradePrompt.tsx     # プレミアム機能のアップグレード促進 UI
 │   ├── categories/           # CategoriesClient, CategoryFormModal, DeleteConfirmDialog
-│   └── dashboard/
-│       ├── DashboardContent.tsx  # データ取得の統合クライアント（refreshKey パターン）
-│       ├── RecordingSection.tsx  # TimerWidget + 手動入力ボタンをまとめる
-│       ├── TimerWidget.tsx       # タイマー UI（TimerContext を消費）
-│       ├── ManualEntryModal.tsx  # 手動入力モーダル（時刻指定 / 時間入力の 2 モード）
-│       ├── RecentEntries.tsx     # 日付グルーピング履歴・インライン削除・CSVエクスポートボタン
-│       └── ExportModal.tsx       # CSV エクスポート期間選択モーダル
+│   ├── dashboard/
+│   │   ├── DashboardContent.tsx   # データ取得統合クライアント（refreshKey パターン）
+│   │   ├── RecordingSection.tsx   # TimerWidget + 手動入力ボタン
+│   │   ├── TimerWidget.tsx        # タイマー UI（TimerContext を消費）
+│   │   ├── ManualEntryModal.tsx   # 手動入力モーダル（時刻指定 / 時間入力）
+│   │   ├── RecentEntries.tsx      # 日付グルーピング履歴・削除・CSV エクスポートボタン
+│   │   └── ExportModal.tsx        # CSV エクスポート期間選択モーダル
+│   ├── pricing/
+│   │   └── PricingTableClient.tsx # Clerk PricingTable を ssr:false で動的インポート
+│   └── reports/
+│       ├── ReportsContent.tsx     # 期間状態管理 + /api/analytics フェッチ統合
+│       ├── PeriodSelector.tsx     # 日次/週次/月次/年次タブ + 前後ナビ
+│       ├── ProductivityCards.tsx  # 総作業時間・平均・最多時間帯・最多カテゴリ
+│       ├── BarChartCard.tsx       # Recharts 棒グラフ（期間で X 軸自動切替）
+│       ├── PieChartCard.tsx       # Recharts 円グラフ + カテゴリ凡例
+│       ├── ActivityHeatmap.tsx    # カスタム CSS Grid カレンダーヒートマップ
+│       └── PDFExportButton.tsx    # window.print() で PDF 出力
 ├── contexts/
 │   └── TimerContext.tsx      # グローバルタイマー状態（localStorage で永続化）
 ├── lib/
+│   ├── constants.ts          # PLAN_SLUG / FREE_FEATURES / PREMIUM_FEATURES
 │   ├── supabase.ts           # 公開用 Supabase クライアント（anon key）
 │   ├── supabase-auth.ts      # 認証済み Supabase クライアント（API Route 専用）
 │   ├── ensure-user.ts        # 初回 API アクセス時に users テーブルを upsert
-│   └── time-utils.ts         # formatDuration / formatHHMMSS / formatTimeRange /
-│                             #   formatDateLabel / toLocalDateKey / calcStats
+│   └── time-utils.ts         # 時間フォーマット・日付ユーティリティ・統計計算
 └── types/
     ├── index.ts              # アプリ共通型定義
     └── database.types.ts     # Supabase スキーマ型（Row / Insert / Update / Relationships）
@@ -82,29 +99,46 @@ src/
 
 ## 重要なパターンと制約
 
-### Clerk v7 (Core 3) の注意点
+### Clerk v7 (Core 3) の廃止コンポーネント
 
-`<SignedIn>` / `<SignedOut>` コンポーネントは Core 3 で**廃止**。クライアントコンポーネントでは `useAuth()` を使う:
+以下は Core 3 で**すべて廃止**。代わりに `useAuth()` フックを使う:
 
 ```tsx
-const { isSignedIn, isLoaded } = useAuth()
-// isLoaded && isSignedIn ? <UserButton /> : <Link href="/sign-in">...</Link>
+// ❌ 廃止: <SignedIn>, <SignedOut>, <Protect>
+// ✅ 代替: useAuth()
+const { isSignedIn, isLoaded, has } = useAuth()
+
+// 認証状態の切り替え
+isLoaded && isSignedIn ? <UserButton /> : <Link href="/sign-in">...</Link>
+
+// プランチェック（PlanProtect の内部実装）
+if (!has?.({ plan: 'premium' })) return <UpgradePrompt />
 ```
 
 サーバーコンポーネントでは `auth()` / `currentUser()` を使用。
 
+### プレミアム機能の保護（PlanProtect）
+
+`src/components/PlanProtect.tsx` が `useAuth().has()` でプランをチェックする:
+
+```tsx
+<PlanProtect>               {/* plan='premium' がデフォルト */}
+  <PremiumFeature />        {/* プレミアムのみ表示 */}
+</PlanProtect>
+// → フリーユーザーには UpgradePrompt を表示
+```
+
+プラン slug は `src/lib/constants.ts` の `PLAN_SLUG.PREMIUM = 'premium'` で定義。Clerk Dashboard の Product slug と一致させること。
+
 ### Supabase + Clerk の統合（カスタムヘッダー方式）
 
-すべての API Route は `createAuthenticatedSupabaseClient()` を使う。これが `x-clerk-user-id` ヘッダーを付与し、DB 側の `get_clerk_user_id()` 関数が RLS で参照する:
+すべての API Route は `createAuthenticatedSupabaseClient()` を使う。`x-clerk-user-id` ヘッダーで DB 側 RLS が動作する:
 
 ```typescript
-// src/lib/supabase-auth.ts
 const supabase = createClient<Database>(url, anonKey, {
   global: { headers: { 'x-clerk-user-id': userId } },
 })
 ```
-
-RLS ポリシーは全テーブルで `user_id = get_clerk_user_id()` を条件とする。
 
 **重要**: SQL Editor でテーブルを作成した場合は GRANT が必要:
 ```sql
@@ -116,7 +150,7 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public
 
 ### users テーブルへの初回登録
 
-Clerk Webhook は使用しない。各 API Route の先頭で `ensureUser(supabase, userId)` を呼ぶ（`src/lib/ensure-user.ts`）。初回アクセス時に users テーブルへ upsert する。
+Clerk Webhook は使用しない。各 API Route の先頭で `ensureUser(supabase, userId)` を呼ぶ。
 
 ### API Route の実装パターン
 
@@ -125,14 +159,7 @@ export async function GET(request: Request) {
   try {
     const { supabase, userId } = await createAuthenticatedSupabaseClient()
     await ensureUser(supabase, userId)
-
-    // クエリパラメータ付きの場合（time-entries など）
-    const { searchParams } = new URL(request.url)
-    const since = searchParams.get('since')
-    let query = supabase.from('time_entries').select('*').order('start_time', { ascending: false })
-    if (since) query = query.gte('start_time', since)
-    const { data, error } = await query
-
+    // ...
     if (error) throw error
     return NextResponse.json(data)
   } catch (err) {
@@ -143,8 +170,6 @@ export async function GET(request: Request) {
   }
 }
 ```
-
-`detail` フィールドにより Supabase の実際のエラーをクライアントで表示できる。
 
 ### `[id]` Route の params（Next.js 15+）
 
@@ -157,30 +182,34 @@ export async function PUT(req: Request, { params }: { params: Params }) {
 
 ### Supabase JOIN クエリの型アサーション
 
-`select('*, categories(id, name, color)')` のような JOIN クエリは、`Database` 型に `Relationships` が定義されていないと TypeScript エラーになる。`as unknown as YourType[]` で回避する:
+JOIN クエリ（`select('*, categories(name)')`）は `Relationships` 未定義により TypeScript エラーになる。`as unknown as T[]` で回避:
 
 ```typescript
-const { data } = await supabase.from('time_entries').select('*, categories(name)')
 const rows = (data ?? []) as unknown as MyRowType[]
 ```
 
 ### ダッシュボードのデータフロー（refreshKey パターン）
 
-`DashboardContent` が単一の state `refreshKey` を持ち、タイマー停止・手動入力・削除など保存操作のたびにインクリメントして再フェッチをトリガーする:
-
 ```typescript
 const refresh = useCallback(() => setRefreshKey((k) => k + 1), [])
-// <RecordingSection onSaved={refresh} />
-// <RecentEntries onRefresh={refresh} />
+// 保存操作後に refresh() を呼ぶと再フェッチが走る
 ```
 
 ### タイマー状態（グローバル）
 
-`TimerContext` は `localStorage` (`project_tracker_timer` キー) に状態を永続化し、ページ遷移後もタイマーが継続する。`providers.tsx` で ClerkProvider の内側にラップ済み。タイマー停止時に `/api/time-entries` へ POST する。
+`TimerContext` は `localStorage`（`project_tracker_timer` キー）に永続化。ページ遷移後も継続。停止時に `/api/time-entries` へ POST。
+
+### PDF 出力
+
+`window.print()` + `@media print` CSS を使用。`html2canvas` は Tailwind v4 CSS変数・Recharts SVG との相性問題があるため不使用。印刷時に隠す要素には `no-print` クラスを付与。
 
 ### CSV エクスポート
 
-`GET /api/export/csv?start=YYYY-MM-DD&end=YYYY-MM-DD` が UTF-8 BOM 付き CSV を返す（Excel での日本語文字化け防止）。クライアントは Blob URL 経由でダウンロードし、`URL.revokeObjectURL` でクリーンアップする。
+`GET /api/export/csv?start=YYYY-MM-DD&end=YYYY-MM-DD` が UTF-8 BOM 付き CSV を返す（Excel 日本語対応）。クライアントは Blob URL 経由でダウンロードし `URL.revokeObjectURL` でクリーンアップ。
+
+### レポートページのデータフロー
+
+`ReportsContent` がピリオド状態（`day/week/month/year`）と anchor（基準日）を管理し、`/api/analytics?start=&end=` をフェッチして各チャートコンポーネントに配布する。期間切替・前後ナビゲーションのロジックは `PeriodSelector.tsx` の `getPeriodRange()` / `navigate()` に集約。
 
 ## 時間ユーティリティ（`src/lib/time-utils.ts`）
 
@@ -196,7 +225,8 @@ const refresh = useCallback(() => setRefreshKey((k) => k + 1), [])
 ## Clerk
 
 認証・課金実装時は `.claude/clerk_document.md` を参照。  
-プラン確認は `has({ plan: 'premium' })` を使用（`publicMetadata` は不可）。
+プラン確認は `has({ plan: 'premium' })` を使用（`publicMetadata` は不可）。  
+`PricingTable` を使う際は Clerk Dashboard で Billing 有効化 + Stripe 接続が必要。
 
 ## Supabase
 
