@@ -32,4 +32,7 @@ git commit -m "commit フェーズ4: データ表示と基本分析"
 git push
 
 
+git add .
+git commit -m "commit フェーズ5: プレミアム機能の実装"
+git push
 

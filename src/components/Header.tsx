@@ -27,7 +27,7 @@ export function Header() {
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
         {/* ロゴ */}
         <Link href="/" className="flex items-center gap-2 font-bold text-gray-900">
-          <Timer className="h-5 w-5 text-indigo-600" />
+          <Timer className="h-5 w-5 text-blue-600" />
           <span>Project Tracker</span>
         </Link>
 
@@ -37,9 +37,9 @@ export function Header() {
             <Link
               key={item.href}
               href={item.href}
-              className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+              className={`rounded-md px-3 py-1.5 text-sm font-semibold transition-all duration-200 ${
                 pathname === item.href
-                  ? 'bg-indigo-50 text-indigo-700'
+                  ? 'bg-blue-50 text-blue-700'
                   : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
               }`}
             >
@@ -62,7 +62,7 @@ export function Header() {
               </Link>
               <Link
                 href="/sign-up"
-                className="rounded-lg bg-indigo-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-indigo-700"
+                className="rounded-xl bg-blue-500 px-5 py-2 text-sm font-semibold text-white shadow-md hover:bg-blue-600 hover:shadow-lg transition-all duration-200"
               >
                 無料で始める
               </Link>

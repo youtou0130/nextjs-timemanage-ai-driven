@@ -23,13 +23,13 @@ export function Sidebar() {
             <Link
               key={href}
               href={href}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all duration-200 ${
                 active
-                  ? 'bg-indigo-50 text-indigo-700'
-                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                  ? 'bg-blue-700 text-white shadow-sm'
+                  : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700'
               }`}
             >
-              <Icon className={`h-4 w-4 shrink-0 ${active ? 'text-indigo-600' : 'text-gray-400'}`} />
+              <Icon className={`h-4 w-4 shrink-0 ${active ? 'text-white' : 'text-gray-400'}`} />
               {label}
             </Link>
           )

@@ -54,6 +54,9 @@ src/
 │   ├── reports/
 │   │   ├── layout.tsx       # Sidebar を含む 2 カラムレイアウト
 │   │   └── page.tsx         # PlanProtect で ReportsContent を保護
+│   ├── user-setting/
+│   │   ├── layout.tsx       # Sidebar を含む 2 カラムレイアウト
+│   │   └── page.tsx         # auth.protect() → UserSettingContent（Clerk UserProfile）
 │   └── api/
 │       ├── categories/route.ts           # GET(?), POST
 │       ├── categories/[id]/route.ts      # PUT, DELETE
@@ -63,6 +66,7 @@ src/
 │       └── export/csv/route.ts           # GET(?start&end) → UTF-8 BOM 付き CSV
 ├── components/
 │   ├── Header.tsx            # 全ページ共通（useAuth で認証状態判定）
+│   ├── Footer.tsx            # ランディングページ用フッター（4 カラムリンク + コピーライト）
 │   ├── Sidebar.tsx           # アプリ内ナビ
 │   ├── PlanProtect.tsx       # useAuth().has() でプランチェック（フリーならUpgradePrompt表示）
 │   ├── UpgradePrompt.tsx     # プレミアム機能のアップグレード促進 UI
@@ -72,7 +76,8 @@ src/
 │   │   ├── RecordingSection.tsx   # TimerWidget + 手動入力ボタン
 │   │   ├── TimerWidget.tsx        # タイマー UI（TimerContext を消費）
 │   │   ├── ManualEntryModal.tsx   # 手動入力モーダル（時刻指定 / 時間入力）
-│   │   ├── RecentEntries.tsx      # 日付グルーピング履歴・削除・CSV エクスポートボタン
+│   │   ├── RecentEntries.tsx      # 日付グルーピング履歴・削除・編集・CSV エクスポートボタン
+│   │   ├── EditEntryModal.tsx     # 既存エントリ編集モーダル（PUT /api/time-entries/[id]）
 │   │   └── ExportModal.tsx        # CSV エクスポート期間選択モーダル
 │   ├── pricing/
 │   │   └── PricingTableClient.tsx # Clerk PricingTable を ssr:false で動的インポート
@@ -226,7 +231,8 @@ const refresh = useCallback(() => setRefreshKey((k) => k + 1), [])
 
 認証・課金実装時は `.claude/clerk_document.md` を参照。  
 プラン確認は `has({ plan: 'premium' })` を使用（`publicMetadata` は不可）。  
-`PricingTable` を使う際は Clerk Dashboard で Billing 有効化 + Stripe 接続が必要。
+`PricingTable` を使う際は Clerk Dashboard で Billing 有効化 + Stripe 接続が必要。  
+`UserProfile` は `routing="hash"` + `ssr: false` 動的インポートで使用（`/user-setting` 参照）。
 
 ## Supabase
 
@@ -237,6 +243,12 @@ Clerk 連携時は `.claude/clerk_supabase_integration_document.md` を参照。
 
 設定変更時は `.claude/tailwind_document.md` を参照。  
 テーマ拡張は `globals.css` の `@theme inline` ブロックで行う（`tailwind.config.js` は作成しない）。
+
+## デザインシステム
+
+UI 実装・修正時は必ず `.claude/design_system.md` を参照。  
+配色・角丸・余白・影・タイポグラフィ・コンポーネントスタイル（ボタン/カード/入力/ナビ）はこのドキュメントの定義に従う。  
+アクセシビリティ（WCAG 2.1）と 44px タッチターゲットの確保が必須。
 
 ## 環境変数（`.env.local`）
 

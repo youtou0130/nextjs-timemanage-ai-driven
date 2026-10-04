@@ -68,12 +68,12 @@ export function DashboardContent({ displayName }: Props) {
         {statCards.map(({ label, value, icon: Icon }) => (
           <div
             key={label}
-            className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
+            className="rounded-2xl border border-gray-300 bg-white p-5 shadow-md transition-all duration-200 hover:border-gray-400 hover:shadow-lg"
           >
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium text-gray-500">{label}</p>
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50">
-                <Icon className="h-4 w-4 text-indigo-600" />
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-blue-200 bg-blue-100">
+                <Icon className="h-4 w-4 text-blue-700" />
               </span>
             </div>
             <p className="mt-3 text-3xl font-bold tabular-nums text-gray-900">

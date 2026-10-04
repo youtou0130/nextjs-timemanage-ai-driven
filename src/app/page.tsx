@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Timer, LayoutDashboard, Tag, ArrowRight, Check } from 'lucide-react'
+import { Footer } from '@/components/Footer'
 
 const features = [
   {
@@ -180,12 +181,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* フッター */}
-      <footer className="border-t border-gray-200 px-4 py-8 sm:px-6">
-        <div className="mx-auto max-w-6xl text-center text-sm text-gray-400">
-          © {new Date().getFullYear()} Project Tracker. All rights reserved.
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

@@ -99,14 +99,14 @@ export function TimerWidget() {
   const selectedCategory = categories.find((c) => c.id === (state.categoryId ?? selectedCategoryId))
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+    <div className="rounded-2xl border border-gray-300 bg-white p-6 shadow-md">
       <h2 className="text-sm font-semibold text-gray-900">タイマー</h2>
 
       {/* 時間表示 */}
       <div className="my-6 flex flex-col items-center">
         <span
           className={`font-mono text-6xl font-bold tabular-nums tracking-tight ${
-            state.status === 'running' ? 'text-indigo-600' : 'text-gray-900'
+            state.status === 'running' ? 'text-blue-500' : 'text-gray-900'
           }`}
         >
           {formatTime(elapsed)}
@@ -131,7 +131,7 @@ export function TimerWidget() {
             <select
               value={selectedCategoryId}
               onChange={(e) => { setSelectedCategoryId(e.target.value); setError('') }}
-              className="w-full appearance-none rounded-lg border border-gray-300 bg-white px-3 py-2 pr-8 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="w-full appearance-none rounded-lg border border-gray-300 bg-white px-3 py-2.5 pr-8 text-sm transition-colors focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20"
             >
               <option value="">カテゴリを選択...</option>
               {categories.map((c) => (
@@ -154,7 +154,7 @@ export function TimerWidget() {
           onChange={(e) => setMemo(e.target.value)}
           placeholder="作業内容などを記録..."
           maxLength={200}
-          className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+          className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm transition-colors placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20"
         />
       </div>
 
@@ -166,7 +166,7 @@ export function TimerWidget() {
         {state.status === 'idle' && (
           <button
             onClick={handleStart}
-            className="flex items-center gap-2 rounded-xl bg-indigo-600 px-8 py-3 text-sm font-semibold text-white hover:bg-indigo-700"
+            className="flex items-center gap-2 rounded-xl bg-blue-500 px-8 py-3 text-sm font-semibold text-white shadow-md transition-all duration-200 hover:bg-blue-600 hover:shadow-lg active:scale-95"
           >
             <Play className="h-4 w-4 fill-white" />
             開始
@@ -177,7 +177,7 @@ export function TimerWidget() {
           <>
             <button
               onClick={handlePause}
-              className="flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-6 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+              className="flex items-center gap-2 rounded-xl border-2 border-blue-700 bg-white px-6 py-3 text-sm font-semibold text-blue-700 shadow-sm transition-all duration-200 hover:bg-blue-50 hover:shadow-md active:scale-95"
             >
               <Pause className="h-4 w-4" />
               一時停止
@@ -185,7 +185,7 @@ export function TimerWidget() {
             <button
               onClick={handleStop}
               disabled={saving}
-              className="flex items-center gap-2 rounded-xl bg-red-500 px-6 py-3 text-sm font-semibold text-white hover:bg-red-600 disabled:opacity-50"
+              className="flex items-center gap-2 rounded-xl bg-red-600 px-6 py-3 text-sm font-semibold text-white shadow-md transition-all duration-200 hover:bg-red-700 hover:shadow-lg active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <Square className="h-4 w-4 fill-white" />
               {saving ? '保存中...' : '停止して保存'}
@@ -197,7 +197,7 @@ export function TimerWidget() {
           <>
             <button
               onClick={handleResume}
-              className="flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white hover:bg-indigo-700"
+              className="flex items-center gap-2 rounded-xl bg-blue-500 px-6 py-3 text-sm font-semibold text-white shadow-md transition-all duration-200 hover:bg-blue-600 hover:shadow-lg active:scale-95"
             >
               <Play className="h-4 w-4 fill-white" />
               再開
@@ -205,7 +205,7 @@ export function TimerWidget() {
             <button
               onClick={handleStop}
               disabled={saving}
-              className="flex items-center gap-2 rounded-xl bg-red-500 px-6 py-3 text-sm font-semibold text-white hover:bg-red-600 disabled:opacity-50"
+              className="flex items-center gap-2 rounded-xl bg-red-600 px-6 py-3 text-sm font-semibold text-white shadow-md transition-all duration-200 hover:bg-red-700 hover:shadow-lg active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <Square className="h-4 w-4 fill-white" />
               {saving ? '保存中...' : '停止して保存'}
